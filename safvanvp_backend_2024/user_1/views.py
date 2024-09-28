@@ -234,14 +234,27 @@ def booking(request):
         if Booking.objects.filter(Phone=phone).exists():
             return JsonResponse({'error':"your are aleady booked"})
         else:
-           
-            last_token=Booking.objects.all().order_by('Token').last()
-            new_token=last_token.Token+1
-
-            Booking.objects.create(Name=name,Age=age,DOB=dob,Phone=phone,Address=address,Email=email,
+            try:
+                 last_token=Booking.objects.all().order_by('Token').last()
+                 new_token=last_token.Token+1
+            
+                 Booking.objects.create(Name=name,Age=age,DOB=dob,Phone=phone,Address=address,Email=email,
                                Appointment_Doctor=doctor,Appointment_dept=dept,Appointment_Date=date,
-                               Appointment_Time=time,Gender=gender,Token=new_token)  
-            return HttpResponse(f"your booking successfully, Token number is {new_token}")
+                               Appointment_Time=time,Gender=gender,Token=new_token)
+                 return JsonResponse({'success':'your booking successfully',
+                                 'Appointment_Doctor':doctor,
+                                 'Appointment_Date':date, 
+                                 'Appointment_Time':time ,
+                                 'Token number is':new_token})
+            except:
+                Booking.objects.create(Name=name,Age=age,DOB=dob,Phone=phone,Address=address,Email=email,
+                               Appointment_Doctor=doctor,Appointment_dept=dept,Appointment_Date=date,
+                               Appointment_Time=time,Gender=gender)
+                return JsonResponse({'success':'your booking successfully',
+                                 'Appointment_Doctor':doctor,
+                                 'Appointment_Date':date, 
+                                 'Appointment_Time':time ,
+                                 'Token number is':"100"})
     else:
       return JsonResponse({'error':'The method is wrong'})
 
